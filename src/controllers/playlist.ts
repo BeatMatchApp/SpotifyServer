@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { SPOTIFY_API_URL } from '../consts/spotify';
 import {
+  SpotifyArtist,
   SpotifySearchResponse,
   SpotifyTrack,
 } from '../models/interfaces/SpotifySearch';
@@ -73,7 +74,9 @@ const getTrackUri = async (
     const chosenTrackUri: SpotifyTrack[] =
       posibbleSongsResponse.tracks.items.filter((item: SpotifyTrack) => {
         item.name === songName &&
-          item.artists.map((artist) => artist.name).includes(artist);
+          item.artists
+            .map((artist: SpotifyArtist) => artist.name)
+            .includes(artist);
       });
 
     return chosenTrackUri?.[0].uri;
