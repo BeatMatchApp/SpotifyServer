@@ -2,13 +2,14 @@ import createServer from './app';
 import http, { Server } from 'http';
 import fs from 'fs';
 import https from 'https';
+import { envVariables } from './config/config';
 
 createServer().then((app) => {
   const port: string = process.env.PORT;
 
   let server: Server;
 
-  if (process.env.NODE_ENV !== 'production') {
+  if (envVariables.nodeEnv !== 'production') {
     server = http.createServer(app);
   } else {
     const certs = {

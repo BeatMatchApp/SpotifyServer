@@ -1,9 +1,7 @@
 import cors from 'cors';
-import dotenv from 'dotenv';
 import express, { Express } from 'express';
 import BaseRouter from './routes/index';
-
-dotenv.config();
+import { callback } from './controllers/login';
 
 const createServer = async (): Promise<Express> => {
   try {
@@ -11,7 +9,8 @@ const createServer = async (): Promise<Express> => {
 
     app.use(cors());
     app.use(express.json());
-    app.use('/api', BaseRouter);
+    app.use('/callback', callback);
+    app.use('/spotifyAPI', BaseRouter);
 
     return app;
   } catch (error) {

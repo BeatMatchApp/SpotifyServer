@@ -6,10 +6,11 @@ import {
   USER_GRANT_PERMISSIONS,
 } from '../consts/spotify';
 import axios from 'axios';
+import { envVariables } from '../config/config';
 
-const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
-const CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
-const REDIRECT_URI = process.env.SPOTIFY_REDIRECT_URI;
+const CLIENT_ID = envVariables.clientId;
+const CLIENT_SECRET = envVariables.clientSecret;
+const REDIRECT_URI = envVariables.redirectURI;
 
 export const login = (_req: Request, res: Response) => {
   const authQuery = querystring.stringify({
@@ -39,9 +40,7 @@ export const callback = async (req, res) => {
 
     const accessToken = response.data.access_token;
 
-    res.redirect(
-      `${process.env.BEATMATCH_CLIENT_URL}/?accessToken=${accessToken}`
-    );
+    res.redirect(`${envVariables.beatMatchURL}/?accessToken=${accessToken}`);
   } catch (error) {
     res.status(400).json({ error: "Failed to get spotify's access token" });
   }

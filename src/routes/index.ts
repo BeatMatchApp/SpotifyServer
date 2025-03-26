@@ -1,8 +1,12 @@
 import { Router } from 'express';
-import geminiRoute from './spotifyLogin';
+import loginRoute from './login';
+import userRoute from './/userDetails';
+import playlistRoute from './playlist';
 
 const baseRouter = Router();
 
-baseRouter.use('/spotifyAPI', geminiRoute);
+baseRouter.use('/', loginRoute);
+baseRouter.use('/users', userRoute);
+baseRouter.use('/playlists', playlistRoute);
 
 export default baseRouter;
