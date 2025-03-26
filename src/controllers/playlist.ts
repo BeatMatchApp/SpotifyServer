@@ -64,7 +64,7 @@ const getTrackUri = async (
   try {
     const response = await axios.get<SpotifySearchResponse>(
       `${SPOTIFY_API_URL}/search?q=${encodeURIComponent(
-        songName + artist
+        `track:${songName} artist:${artist}`
       )}&type=track&limit=5`,
       { headers: { Authorization: `Bearer ${accessToken}` } }
     );
@@ -72,14 +72,15 @@ const getTrackUri = async (
     const posibbleSongsResponse: SpotifySearchResponse = response.data;
 
     const chosenTrackUri: SpotifyTrack[] =
-      posibbleSongsResponse.tracks.items.filter((item: SpotifyTrack) => {
-        item.name === songName &&
+      posibbleSongsResponse.tracks.items.filter(
+        (item: SpotifyTrack) =>
+          item.name.toLowerCase() === songName.toLowerCase() &&
           item.artists
-            .map((artist: SpotifyArtist) => artist.name)
-            .includes(artist);
-      });
+            .map((artist: SpotifyArtist) => artist.name.toLowerCase())
+            .includes(artist.toLowerCase())
+      );
 
-    return chosenTrackUri?.[0].uri;
+    return chosenTrackUri?.[0]?.uri;
   } catch (error) {
     throw new Error(`Error searching song: ${error.response?.data || error}`);
   }
