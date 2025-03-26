@@ -16,8 +16,8 @@ export const login = (_req: Request, res: Response) => {
   const authQuery = querystring.stringify({
     response_type: 'code',
     client_id: CLIENT_ID,
-    USER_GRANT_PERMISSIONS,
     redirect_uri: REDIRECT_URI,
+    scope: USER_GRANT_PERMISSIONS.join(' '),
   });
   res.redirect(`${SPOTIFY_AUTH_URL}?${authQuery}`);
 };
