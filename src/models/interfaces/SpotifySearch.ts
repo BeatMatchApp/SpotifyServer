@@ -10,6 +10,6 @@ export interface SpotifyTrack {
   uri: string;
 }
 
-interface SpotifyArtist {
+export interface SpotifyArtist {
   name: string;
 }
