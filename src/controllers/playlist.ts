@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { Request, Response } from 'express';
 import { SPOTIFY_API_URL } from '../consts/spotify';
 import {
   SpotifyArtist,
@@ -6,15 +7,16 @@ import {
   SpotifyTrack,
 } from '../models/interfaces/SpotifySearch';
 import { TrackDetails } from '../models/interfaces/Track';
+import { generateSpotifyHeaders } from '../consts/auth';
 
-export const createPlaylist = async (req, res) => {
-  const { accessToken, userId, playlistName } = req.body;
+export const createPlaylist = async (req: Request, res: Response) => {
+  const { userId, playlistName } = req.body;
 
   try {
     const response = await axios.post(
       `${SPOTIFY_API_URL}/users/${userId}/playlists`,
       { name: playlistName, public: false },
-      { headers: { Authorization: `Bearer ${accessToken}` } }
+      { headers: generateSpotifyHeaders(req) }
     );
 
     res.json(response.data);
@@ -25,15 +27,15 @@ export const createPlaylist = async (req, res) => {
   }
 };
 
-export const addSong = async (req, res) => {
-  const { accessToken, playlistId, songName, artist } = req.body;
+export const addSong = async (req: Request, res: Response) => {
+  const { playlistId, songName, artist } = req.body;
 
-  if (!accessToken || !playlistId || !songName || !artist) {
+  if (!playlistId || !songName || !artist) {
     return res.status(400).json({ error: 'Missing parameters' });
   }
 
   try {
-    const trackUri: string = await getTrackUri(accessToken, {
+    const trackUri: string = await getTrackUri(req, {
       songName,
       artist,
     });
@@ -42,7 +44,7 @@ export const addSong = async (req, res) => {
       const response = await axios.post(
         `${SPOTIFY_API_URL}/playlists/${playlistId}/tracks`,
         { uris: [trackUri], public: false },
-        { headers: { Authorization: `Bearer ${accessToken}` } }
+        { headers: generateSpotifyHeaders(req) }
       );
 
       res.json({ success: true, message: 'Song added!', data: response.data });
@@ -56,7 +58,7 @@ export const addSong = async (req, res) => {
 };
 
 const getTrackUri = async (
-  accessToken: string,
+  req: Request,
   trackDetails: TrackDetails
 ): Promise<string | null> => {
   const { songName, artist } = trackDetails;
@@ -66,7 +68,7 @@ const getTrackUri = async (
       `${SPOTIFY_API_URL}/search?q=${encodeURIComponent(
         `track:${songName} artist:${artist}`
       )}&type=track&limit=5`,
-      { headers: { Authorization: `Bearer ${accessToken}` } }
+      { headers: generateSpotifyHeaders(req) }
     );
 
     const posibbleSongsResponse: SpotifySearchResponse = response.data;
