@@ -7,6 +7,7 @@ import {
 } from '../consts/spotify';
 import axios from 'axios';
 import { envVariables } from '../config/config';
+import { HOUR, MONTH } from '../consts/general';
 
 const CLIENT_ID = envVariables.clientId;
 const CLIENT_SECRET = envVariables.clientSecret;
@@ -22,7 +23,7 @@ export const login = (_req: Request, res: Response) => {
   res.redirect(`${SPOTIFY_AUTH_URL}?${authQuery}`);
 };
 
-export const callback = async (req, res) => {
+export const callback = async (req: Request, res: Response) => {
   const code = req.query.code;
 
   try {
@@ -38,9 +39,23 @@ export const callback = async (req, res) => {
       { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
     );
 
-    const accessToken = response.data.access_token;
+    const { access_token, resresh_token } = response.data;
 
-    res.redirect(`${envVariables.beatMatchURL}/?accessToken=${accessToken}`);
+    res.cookie('spotify_access_token', access_token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+      maxAge: HOUR,
+    });
+
+    res.cookie('spotify_refresh_token', resresh_token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+      maxAge: MONTH,
+    });
+
+    res.redirect(`${envVariables.beatMatchURL}`);
   } catch (error) {
     res.status(400).json({ error: "Failed to get spotify's access token" });
   }
